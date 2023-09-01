@@ -20,9 +20,9 @@
                             </div>
                             <div class="card-footer">
                                 <div class="btn-group" role="group">
-                                    <a href="#" class="btn btn-outline-primary">View</a>
-                                    <button class="btn btn-outline-primary">Edit</button>
-                                    <button class="btn btn-outline-danger">Delete</button>
+                                    <a href="{% url 'newsletters:client_view' object.pk%}" class="btn btn-outline-primary">View</a>
+                                    <a href="{% url 'newsletters:client_update' object.pk%}" class="btn btn-outline-primary">Edit</a>
+                                    <a href="{% url 'newsletters:client_delete' object.pk %}" class="btn btn-outline-danger">Delete</a>
                                 </div>
                             </div>
                         </div>
