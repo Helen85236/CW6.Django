@@ -45,6 +45,7 @@ INSTALLED_APPS = [
 
     'newsletters',
     'django_crontab',
+    'users',
 ]
 
 MIDDLEWARE = [
@@ -144,6 +145,11 @@ LOGS_ROOT = BASE_DIR / 'logs'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'users.User'
+
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/'
 
 # EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.getenv('EMAIL_HOST')                    # using smtp.gmail.com
