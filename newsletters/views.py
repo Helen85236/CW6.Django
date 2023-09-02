@@ -3,7 +3,7 @@ from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 from newsletters.forms import ClientForm
-from newsletters.models import Client
+from newsletters.models import Client, Newsletter, Content
 
 def index(request):
     # Testing
@@ -28,6 +28,7 @@ class ClientCreateView(CreateView):
 class ClientDetailView(DetailView):
     model = Client
 
+
 class ClientUpdateView(UpdateView):
     model = Client
     form_class = ClientForm
@@ -43,3 +44,14 @@ class ClientUpdateView(UpdateView):
 class ClientDeleteView(DeleteView):
     model = Client
     success_url = reverse_lazy('newsletters:client_list')
+
+
+class NewsLetterListView(ListView):
+    model = Newsletter
+
+
+    def get_context_data(self, *args, **kwargs):
+        context_data = super().get_context_data(*args, **kwargs)
+        # Get information of newsletter content
+        context_data['content_list'] = Content.objects.all()
+        return context_data

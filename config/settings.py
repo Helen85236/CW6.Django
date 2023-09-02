@@ -82,12 +82,12 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': os.getenv('ENGINE'),
         'NAME':  os.getenv('POSTGRES_DB'),
         'USER': os.getenv('POSTGRES_USER'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
         'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': '5432',
+        'PORT': os.getenv('POSTGRES_PORT'),
 
 }
 }
@@ -117,7 +117,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -142,3 +142,11 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = os.getenv('EMAIL_HOST')                    # using smtp.gmail.com
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')          # google account
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # google app password
+EMAIL_PORT = os.getenv('EMAIL_PORT')                    # google port 587
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)=='True'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', False)=='False'
