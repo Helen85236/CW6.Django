@@ -138,6 +138,7 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = BASE_DIR / 'media'
 
+LOGS_ROOT = BASE_DIR / 'logs'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -153,5 +154,5 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)=='True'
 EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', False)=='True'
 
 CRONJOBS = [
-    ('0 0 15 * *', 'newsletters.services.check_job')
+    ('*/1 * * * *', 'newsletters.services.check_job')
 ]
