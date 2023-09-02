@@ -1,9 +1,10 @@
+from django.forms import inlineformset_factory
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
-from newsletters.forms import ClientForm
-from newsletters.models import Client, Newsletter, Content
+from newsletters.forms import ClientForm, NewsletterForm, ContentForm
+from newsletters.models import Client, Newsletter, Content, Trial
 
 def index(request):
     # Testing
@@ -46,12 +47,60 @@ class ClientDeleteView(DeleteView):
     success_url = reverse_lazy('newsletters:client_list')
 
 
-class NewsLetterListView(ListView):
+class NewsletterListView(ListView):
     model = Newsletter
-
 
     def get_context_data(self, *args, **kwargs):
         context_data = super().get_context_data(*args, **kwargs)
         # Get information of newsletter content
         context_data['content_list'] = Content.objects.all()
+        return context_data
+
+
+class NewsletterCreateView(CreateView):
+    model = Newsletter
+    form_class = NewsletterForm
+    success_url = reverse_lazy('newsletters:newsletter_list')
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        ContentFormSet = inlineformset_factory(Newsletter, Content, form=ContentForm, extra=1, can_delete=False)
+        if self.request.method == 'POST':
+            formset = ContentFormSet(self.request.POST, instance=self.object)
+        else:
+            formset = ContentFormSet(instance=self.object)
+
+        context_data['formset'] = formset
+        return context_data
+
+    def form_valid(self, form):
+        context_data = self.get_context_data()
+        formset = context_data['formset']
+        self.object = form.save()
+        self.object.status = 'created'
+        self.object.save()
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+        return super().form_valid(form)
+
+
+class NewsletterDetailView(DetailView):
+    model = Newsletter
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        # Retrieve content for newsletter
+        content_item = Content.objects.get(settings=self.object)
+        context_data['content'] = content_item
+        # Retrieve last trial for newsletter
+        try:
+            # trial = Trial.objects.get(pk=self.kwargs.get('pk'))
+            trial = Trial.objects.all()
+            print(trial.last())
+            if trial:
+                context_data['trial'] = trial.last()
+        except Trial.DoesNotExist:
+            pass
         return context_data
