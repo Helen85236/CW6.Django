@@ -104,3 +104,49 @@ class NewsletterDetailView(DetailView):
         except Trial.DoesNotExist:
             pass
         return context_data
+
+
+class NewsletterUpdateView(UpdateView):
+    model = Newsletter
+    form_class = NewsletterForm
+
+    def get_success_url(self):
+        return reverse('newsletters:newsletter_update', args=[self.object.pk])
+
+    # Basic validation using models fields
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        ContentFormSet = inlineformset_factory(Newsletter, Content, form=ContentForm, extra=0, can_delete=False)
+        if self.request.method == 'POST':
+            formset = ContentFormSet(self.request.POST, instance=self.object)
+        else:
+            formset = ContentFormSet(instance=self.object)
+
+        context_data['formset'] = formset
+        return context_data
+
+    def form_valid(self, form):
+        context_data = self.get_context_data()
+        formset = context_data['formset']
+        self.object = form.save()
+        self.object.status = 'created'
+        self.object.save()
+
+        if formset.is_valid():
+            formset.instance = self.object
+            formset.save()
+        return super().form_valid(form)
+
+
+class NewsletterDeleteView(DeleteView):
+    model = Newsletter
+    success_url = reverse_lazy('newsletters:newsletter_list')
+
+    #Get title for newsletter
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        # Retrieve content for newsletter
+        content_item = Content.objects.get(settings=self.object)
+        print(content_item.title)
+        context_data['title'] = content_item.title
+        return context_data
