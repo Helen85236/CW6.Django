@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, \
     PermissionRequiredMixin
+from django.contrib.auth.models import Group
 from django.forms import inlineformset_factory
 from django.http import Http404
 from django.shortcuts import render
@@ -12,7 +13,7 @@ from newsletters.models import Client, Newsletter, Content, Trial
 ## TODO: Implement main page
 def index(request):
     # Testing
-    return render(request, 'newsletters/base.html')
+    return render(request, 'newsletters/index.html')
 
 
 class ClientListView(LoginRequiredMixin, ListView):
@@ -69,6 +70,8 @@ class NewsletterListView(LoginRequiredMixin, ListView):
 
     # Display only user's newsletters
     def get_queryset(self):
+        if self.request.user.is_staff:
+            return super().get_queryset()
         return super().get_queryset().filter(owner=self.request.user)
 
     def get_context_data(self, *args, **kwargs):
