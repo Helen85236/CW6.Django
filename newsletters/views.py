@@ -1,3 +1,5 @@
+import random
+
 from django.contrib.auth.mixins import LoginRequiredMixin, \
     PermissionRequiredMixin
 from django.contrib.auth.models import Group
@@ -5,15 +7,40 @@ from django.forms import inlineformset_factory
 from django.http import Http404
 from django.shortcuts import render
 from django.urls import reverse_lazy, reverse
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
+from blog.models import Blog
 from newsletters.forms import ClientForm, NewsletterForm, ContentForm
 from newsletters.models import Client, Newsletter, Content, Trial
+from newsletters.services import get_newsletter_cache
 
-## TODO: Implement main page
+@cache_page(60)
 def index(request):
-    # Testing
-    return render(request, 'newsletters/index.html')
+    """
+    FBV for Main page realisation
+    """
+    # Get newsletters form cache
+    cached_newsletters = get_newsletter_cache()
+    # Get total number of all newsletters
+    total_newsletters = cached_newsletters.count()
+    # Get total number of active newsletters
+    active_newsletters = len(cached_newsletters.exclude(status='finished'))
+    # Get total number of unique clients
+    total_clients = len(Client.objects.all().distinct('email'))
+    # Get random 3 blogs
+    blogs = Blog.objects.all()
+    while blogs.count() > 3:
+        blog_index = random.randint(0,blogs.count()-1)
+        blogs = blogs.exclude(pk=blogs[blog_index].pk)
+
+    context = {
+        "total_newsletters" : total_newsletters,
+        "active_newsletters" : active_newsletters,
+        "total_clients" : total_clients,
+        "blogs" : blogs,
+    }
+    return render(request, 'newsletters/index.html', context)
 
 
 class ClientListView(LoginRequiredMixin, ListView):
@@ -162,8 +189,6 @@ class NewsletterUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateVi
         context_data = self.get_context_data()
         formset = context_data['formset']
         self.object = form.save()
-        self.object.status = 'created'
-        self.object.save()
 
         if formset.is_valid():
             formset.instance = self.object

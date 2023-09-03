@@ -5,6 +5,7 @@ from dateutil.relativedelta import relativedelta # package from monthly dates
 import smtplib  # library to handle SMTP exceptions
 
 from django.conf import settings
+from django.core.cache import cache
 from django.core.mail import send_mail
 
 from newsletters.models import Newsletter, Client, Content, Trial
@@ -15,13 +16,6 @@ FREQUENCY = {
     'weekly': datetime.timedelta(weeks=1),
     'monthly': relativedelta(months=1)
 }
-
-## TODO: Remove after finish
-def log(message):
-    message = str(datetime.datetime.now()) + ':   ' + message + '\n'
-    with open('/Users/markpcv/Desktop/test/test.txt', 'a') as f:
-        f.write(message)
-
 
 def log_trial(trial: Trial):
     """
@@ -101,23 +95,6 @@ def send_newsletter(newsletter: Newsletter, content: Content):
             log_trial(trial)
 
 
-## TODO: perhaps not needed
-def check_trials(content: Content) -> bool:
-    """
-    Checks if newsletter is successfully delivered to every client
-    """
-    # Get all clients
-    clients = Client.objects.all()
-    for client in clients:
-        # Get last trial for a client
-        trial = Trial.objects.all().filter(client=client,
-                                           content=content).last()
-        if trial.status == 'unsuccessful':
-            return False
-
-    return True
-
-
 def is_active(newsletter:Newsletter) -> bool:
     # Check newsletter status
     return newsletter.status != 'finished'
@@ -140,3 +117,19 @@ def check_job():
             content = get_content(newsletter)
             # Send email to each client
             send_newsletter(newsletter, content)
+
+
+def get_newsletter_cache():
+    """
+    Function to get cache of newsletters
+    """
+    if settings.CACHE_ENABLED:
+        key = 'newsletter_list'
+        newsletter_list = cache.get(key)
+        if newsletter_list is None:
+            newsletter_list = Newsletter.objects.all()
+            cache.set(key, newsletter_list)
+    else:
+        newsletter_list = Newsletter.objects.all()
+
+    return newsletter_list
