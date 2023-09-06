@@ -44,7 +44,7 @@
                                                 <a href="{% url 'newsletters:newsletter_delete' object.pk %}" class="btn btn-outline-danger">Delete</a>
                                             {% endif %}
                                         </div>
-                                        {% if user.is_staff and object.status != 'finished' %}
+                                        {% if user.is_staff or perms.newsletters.view_newsletter and object.status != 'finished' %}
                                             <a href="{% url 'users:deactivate_newsletter' object.pk%}" class="btn btn-warning">Turn off</a>
                                         {% endif %}
                                     </div>

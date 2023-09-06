@@ -35,6 +35,7 @@ def index(request):
         blogs = blogs.exclude(pk=blogs[blog_index].pk)
 
     context = {
+        "newsletters" : cached_newsletters,
         "total_newsletters" : total_newsletters,
         "active_newsletters" : active_newsletters,
         "total_clients" : total_clients,
@@ -97,7 +98,7 @@ class NewsletterListView(LoginRequiredMixin, ListView):
 
     # Display only user's newsletters
     def get_queryset(self):
-        if self.request.user.is_staff:
+        if self.request.user.is_staff or self.request.user.has_perm('newsletters.view_newsletter'):
             return super().get_queryset()
         return super().get_queryset().filter(owner=self.request.user)
 

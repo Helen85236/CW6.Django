@@ -1,5 +1,5 @@
 from django.conf import settings
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import Group
 from django.contrib.sites.shortcuts import get_current_site
@@ -9,7 +9,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.views import LoginView as BaseLoginView
 from django.contrib.auth.views import LogoutView as BaseLogoutView
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import CreateView, UpdateView, ListView
 
 from newsletters.models import Newsletter
@@ -78,7 +78,8 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-@login_required
+
+@permission_required('newsletters.set_disabled')
 def deactivate_newsletter(request, pk):
     newsletter = Newsletter.objects.get(pk=pk)
     newsletter.status = 'finished'
@@ -90,11 +91,17 @@ class UserListView(LoginRequiredMixin, ListView):
     model = User
 
     # Display only user's clients
+
     def get_queryset(self):
-        return super().get_queryset().exclude(pk=self.request.user.pk)
+        if self.request.user.has_perm('users.viewed_list'):
+            return super().get_queryset().exclude(pk=self.request.user.pk)
+        else:
+            return super().get_queryset().none()
 
 
-@login_required
+
+
+@permission_required('users.set_blocked')
 def deactivate_user(request, pk):
     user = User.objects.get(pk=pk)
     if user.is_active:

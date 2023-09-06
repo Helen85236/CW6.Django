@@ -6,7 +6,7 @@ from users.views import LoginView, LogoutView, RegisterView, ProfileView, \
 
 app_name = UsersConfig.name
 
-urlpatterns = {
+urlpatterns = [
     path('', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('register/', RegisterView.as_view(), name='register'),
@@ -15,4 +15,4 @@ urlpatterns = {
     path('deactivate/newsletter/<int:pk>', deactivate_newsletter, name='deactivate_newsletter'),
     path('users/', UserListView.as_view(), name='user_list'),
     path('deactivate/user/<int:pk>', deactivate_user, name='deactivate_user'),
-}
+]

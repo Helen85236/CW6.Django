@@ -34,7 +34,7 @@ class Newsletter(models.Model):
     time = models.TimeField(default=timezone.now, verbose_name='time')
     frequency = models.CharField(max_length=50, verbose_name='frequency')
     status = models.CharField(max_length=50, verbose_name='status')
-
+    active = models.BooleanField(default=True)
     owner = models.ForeignKey(settings.AUTH_USER_MODEL,
                               on_delete=models.SET_NULL, **NULLABLE,
                               verbose_name='owner')
@@ -46,6 +46,12 @@ class Newsletter(models.Model):
         verbose_name = 'newsletter'
         verbose_name_plural = 'newsletters'
         ordering = ['time']
+        permissions = [
+            (
+                'set_disabled',
+                'Can disabled'
+            )
+        ]
 
 class Content(models.Model):
     """A class model for newsletter content"""
