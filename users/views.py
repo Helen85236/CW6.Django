@@ -55,7 +55,7 @@ class RegisterView(CreateView):
         # Get current domain
         current_site = get_current_site(self.request)
         # Compose mail message
-        message = render_to_string('users/email_verification.html',{
+        message = render_to_string('users/email_verification.html', {
             'domain': current_site.domain,
             'pk': self.object.pk,
         })
@@ -78,7 +78,6 @@ class ProfileView(LoginRequiredMixin, UpdateView):
         return self.request.user
 
 
-
 @permission_required('newsletters.set_disabled')
 def deactivate_newsletter(request, pk):
     newsletter = Newsletter.objects.get(pk=pk)
@@ -99,8 +98,6 @@ class UserListView(LoginRequiredMixin, ListView):
             return super().get_queryset().none()
 
 
-
-
 @permission_required('users.set_blocked')
 def deactivate_user(request, pk):
     user = User.objects.get(pk=pk)
@@ -110,4 +107,3 @@ def deactivate_user(request, pk):
         user.is_active = True
     user.save()
     return redirect(reverse('users:user_list'))
-

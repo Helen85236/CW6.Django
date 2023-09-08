@@ -21,12 +21,11 @@ class StyleFormMixin:
         for field_name, field in self.fields.items():
             # Create dropdown list for frequency field
             if field_name == 'frequency':
-                field.widget=forms.Select(choices=FREQUENCY)
+                field.widget = forms.Select(choices=FREQUENCY)
             # Create dropdown list for status field
             if field_name == 'status':
                 field.widget = forms.Select(choices=STATUS)
             field.widget.attrs['class'] = 'form-control'
-
 
 
 class ClientForm(StyleFormMixin, forms.ModelForm):

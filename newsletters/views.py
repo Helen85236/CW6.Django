@@ -15,6 +15,7 @@ from newsletters.forms import ClientForm, NewsletterForm, ContentForm
 from newsletters.models import Client, Newsletter, Content, Trial
 from newsletters.services import get_newsletter_cache
 
+
 # @cache_page(60)
 def index(request):
     """
@@ -31,15 +32,15 @@ def index(request):
     # Get random 3 blogs
     blogs = Blog.objects.all()
     while blogs.count() > 3:
-        blog_index = random.randint(0,blogs.count()-1)
+        blog_index = random.randint(0, blogs.count()-1)
         blogs = blogs.exclude(pk=blogs[blog_index].pk)
 
     context = {
-        "newsletters" : cached_newsletters,
-        "total_newsletters" : total_newsletters,
-        "active_newsletters" : active_newsletters,
-        "total_clients" : total_clients,
-        "blogs" : blogs,
+        "newsletters": cached_newsletters,
+        "total_newsletters": total_newsletters,
+        "active_newsletters": active_newsletters,
+        "total_clients": total_clients,
+        "blogs": blogs,
     }
     return render(request, 'newsletters/index.html', context)
 
@@ -58,7 +59,6 @@ class ClientCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     success_url = reverse_lazy('newsletters:client_list')
     permission_required = 'newsletters.add_client'
 
-
     # Basic validation using models fields
     def form_valid(self, form):
         self.object = form.save()
@@ -66,7 +66,6 @@ class ClientCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
         self.object.save()
 
         return super().form_valid(form)
-
 
 
 class ClientDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
@@ -202,7 +201,7 @@ class NewsletterDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteVi
     success_url = reverse_lazy('newsletters:newsletter_list')
     permission_required = 'newsletters.delete_newsletter'
 
-    #Get title for newsletter
+    # Get title for newsletter
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         # Retrieve content for newsletter

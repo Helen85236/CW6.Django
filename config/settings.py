@@ -25,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-b765&+=#_$q))n3)&c$_j#z66#n-0l=i78dc=)75j3d10o-+vv'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -92,7 +92,7 @@ DATABASES = {
         'HOST': os.getenv('POSTGRES_HOST'),
         'PORT': os.getenv('POSTGRES_PORT'),
 
-}
+    }
 }
 
 
@@ -158,8 +158,8 @@ EMAIL_HOST = os.getenv('EMAIL_HOST')                    # using smtp.gmail.com
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')          # google account
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')  # google app password
 EMAIL_PORT = 587                    # google port 587
-EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False)=='True'
-EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', False)=='True'
+EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS', False) == 'True'
+EMAIL_USE_SSL = os.getenv('EMAIL_USE_SSL', False) == 'True'
 
 CRONJOBS = [
     ('*/1 * * * *', 'newsletters.services.check_job')
