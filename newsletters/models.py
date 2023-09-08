@@ -53,6 +53,7 @@ class Newsletter(models.Model):
             )
         ]
 
+
 class Content(models.Model):
     """A class model for newsletter content"""
     title = models.CharField(max_length=250, verbose_name='title')
@@ -68,7 +69,6 @@ class Content(models.Model):
     class Meta:
         verbose_name = 'content'
         verbose_name_plural = 'contents'
-
 
 
 class Trial(models.Model):
